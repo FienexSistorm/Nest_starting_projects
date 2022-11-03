@@ -1,0 +1,9 @@
+{
+  "prettier/prettier": [
+    "error",
+    {},
+    {
+      "usePrettierrc": false
+    }
+  ]
+}
