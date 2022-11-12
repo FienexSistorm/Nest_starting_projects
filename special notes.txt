@@ -1,0 +1,37 @@
+# ------------------------------- ESLINT ISSUE ------------------------------- #
+ when generating a new nest project, it will often show an error when skipping spaces, to prevent this issue ::
+	*% in the .eslintrc.js file add this imoprt in the top :   const prettierConfig = require('./.prettierrc.js')
+	*% after that, in the "rules" array, add this section 
+						"prettier/prettier": [
+					      "error",
+					      prettierConfig // Magic here
+					    ],
+# ----------------------------------- ***** ---------------------------------- #
+
+# --------------------------- Generating a resource -------------------------- #
+Nest CLI helps up reduce the developpement process by allowing us to generate the whole resource instead of creating 
+the controller, service, models, dtos, module manually.
+To do so , Use the CLI Commande :   nest generate resource [name] 
+# ----------------------------------- ***** ---------------------------------- #
+
+# ------------------------- Express Code Autocomplete ------------------------ #
+To make use of expres langauge support and autocomplete when writing nest code, We need to install a package @types/exporess
+		 npm install --save @types/express 
+# ----------------------------------- ***** ---------------------------------- #
+
+# ---------------------------- Circular Dependency --------------------------- #
+It is caused by an injection of a module's Class
+# ----------------------------------- ***** ---------------------------------- #
+
+# -------------------- Class-Validator Approach for PIPES -------------------- #
+The use of the class-validator library for implimenting Validation Pipes is only available for TypeScript based project.
+And not vanilla JavaScript. If you are using vanilla JavaScript in your Nest Porject, You should follow the 
+SCHEMA BASED VALIDATION Approach.
+To use The class-Validator Approach Do not forget to install the appropriate packages
+		~ $ npm i --save class-validator class-transformer	 
+# ----------------------------------- ***** ---------------------------------- #
+
+# ---------------------- Database Integration ~~ TypeORM --------------------- #
+To integrate the database with a nest project , we need to install TypeORM and the client Api library (MS SQL, MySQL, Mongo ,...)
+example pf MySQL : 		$ npm i --save @nestjs/typeorm typeorm mysql2
+# ----------------------------------- ***** ---------------------------------- #
