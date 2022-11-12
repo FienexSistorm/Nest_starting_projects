@@ -25,6 +25,7 @@ export class AnimalService {
 
 
 
+
     listAnimals(): Animal[] {
         return this.animals;
     }
@@ -40,15 +41,11 @@ export class AnimalService {
     }
 
     updateAnimal(animal: Animal) {
-        let oldAnimal = this.animals.find(el => el.id == animal.id);
-        oldAnimal.sound = animal.sound;
-        oldAnimal.name = animal.name;
 
-        return this.animals;
     }
 
     deleteAnimal(idAnimal: number): Animal[] {
-        this.animals = this.animals.filter(val => val.id != idAnimal);
+        this.animals = this.animals.filter(val => val.id !== idAnimal)
         return this.animals;
     }
 
