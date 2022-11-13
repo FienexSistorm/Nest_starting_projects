@@ -49,13 +49,21 @@ export class UserService {
   // Push a photo to a user's photos list
   async pushPhoto(userId: number, photo: CreatePhotoDto) {
 
-    await this.photoRepo.save(photo).then(res => {    // saving the given photo
+    // await this.photoRepo.save(photo).then(res => {    // saving the given photo
 
-      this.userRepo.findOne({ where: { id: userId } }).then(user => {  // Extracting the existing user using its id
-        user.photos.push(res);    // Pushing the photo to the list of photos of the user
-        this.userRepo.save(user)  // save the new version of the user 
-      })
-    })
+    //   this.userRepo.findOne({ where: { id: userId } }).then(user => {  // Extracting the existing user using its id
+    //     user.photos.push(res);    // Pushing the photo to the list of photos of the user
+    //     this.userRepo.save(user)  // save the new version of the user 
+    //   })
+    // })
+
+
+    // SECTION : Another way of writing the previous code in a simple matter  
+    let saved_photo = await this.photoRepo.save(photo);
+    let user = await this.userRepo.findOne({ where: { id: userId } });
+
+    user.photos.push(saved_photo);
+    return this.userRepo.save(user)
 
   }
 }
