@@ -4,6 +4,7 @@ import { PhotoService } from './photo.service';
 import { Body, Controller, Param, Post } from '@nestjs/common';
 import { Inject } from '@nestjs/common/decorators/core/inject.decorator';
 import { Get } from '@nestjs/common/decorators/http/request-mapping.decorator';
+import { CreatePhotoDto } from './photo-dto/create-photo.dto';
 
 @Controller('photo')
 export class PhotoController {
@@ -21,7 +22,7 @@ export class PhotoController {
     }
 
     @Post(":userId")
-    createPhoto(@Param("userId") userId: number, @Body() photo: Photo) {
+    createPhoto(@Param("userId") userId: number, @Body() photo: CreatePhotoDto) {
         this.userServ.pushPhoto(userId, photo);
     }
 

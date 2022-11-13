@@ -1,3 +1,4 @@
+import { CreatePhotoDto } from './photo-dto/create-photo.dto';
 import { PhotoService } from './photo.service';
 import { Photo } from './entities/photo.entity';
 import { User } from './entities/user.entity';
@@ -45,20 +46,16 @@ export class UserService {
   }
 
 
-  // Push a photo to a user
-  pushPhoto(userId: number, ph: Photo): void {
-    this.photoRepo.save(ph).then(photo => {
+  // Push a photo to a user's photos list
+  async pushPhoto(userId: number, photo: CreatePhotoDto) {
 
-      this.findOne(userId).then(res => {
-        let user = res;
-        user.photos.push(photo);
-        this.dataSource
-          .createQueryBuilder()
-          .update(User)
-          .set(user)
-          .where("id =:id", { id: userId })
-          .execute()
+    await this.photoRepo.save(photo).then(res => {    // saving the given photo
+
+      this.userRepo.findOne({ where: { id: userId } }).then(user => {  // Extracting the existing user using its id
+        user.photos.push(res);    // Pushing the photo to the list of photos of the user
+        this.userRepo.save(user)  // save the new version of the user 
       })
     })
+
   }
 }

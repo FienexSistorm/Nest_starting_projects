@@ -25,15 +25,8 @@ export class PhotoService {
     }
 
     async pushPhoto(userId: number, photo: Photo) {
-        let saved_photo = await this.photoRepo.save(photo);
-        return this.dataSource
-            .createQueryBuilder()
-            .update(User)
-            .set({
-                photos: [saved_photo]
-            })
-            .where("id = :id", { id: userId })
-            .execute();
+
+        await this.dataSource.manager.save(photo);  // saving the given photo
     }
 
 }

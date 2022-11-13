@@ -34,4 +34,5 @@ To use The class-Validator Approach Do not forget to install the appropriate pac
 # ---------------------- Database Integration ~~ TypeORM --------------------- #
 To integrate the database with a nest project , we need to install TypeORM and the client Api library (MS SQL, MySQL, Mongo ,...)
 example pf MySQL : 		$ npm i --save @nestjs/typeorm typeorm mysql2
+For classes that have been decalred as @Entity, It is forbidden to set a intial value for their attributes
 # ----------------------------------- ***** ---------------------------------- #
