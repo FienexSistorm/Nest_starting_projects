@@ -1,5 +1,5 @@
 import { User } from './user.entity';
-import { Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 
 
 @Entity()
@@ -8,8 +8,11 @@ export class Photo {
     @PrimaryGeneratedColumn()
     id: number;
 
+    @Column({ default: "" })
+    name: string;
 
-    @ManyToOne(type => User, user => user.photos)
+
+    @ManyToOne(type => User, user => user.photos, { lazy: true })
     user: User;
 
 

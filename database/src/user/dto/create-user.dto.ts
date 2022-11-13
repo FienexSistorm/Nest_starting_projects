@@ -1,3 +1,4 @@
+import { Photo } from './../entities/photo.entity';
 export class CreateUserDto {
     id: number;
 
@@ -6,4 +7,6 @@ export class CreateUserDto {
     lastName: string;
 
     isActive: boolean;
+
+    photos: Photo[];
 }
