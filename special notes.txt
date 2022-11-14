@@ -33,6 +33,92 @@ To use The class-Validator Approach Do not forget to install the appropriate pac
 
 # ---------------------- Database Integration ~~ TypeORM --------------------- #
 To integrate the database with a nest project , we need to install TypeORM and the client Api library (MS SQL, MySQL, Mongo ,...)
-example pf MySQL : 		$ npm i --save @nestjs/typeorm typeorm mysql2
+example pf MySQL : 		~ $ npm i --save @nestjs/typeorm typeorm mysql2
 For classes that have been decalred as @Entity, It is forbidden to set a intial value for their attributes
 # ----------------------------------- ***** ---------------------------------- #
+
+# ------------------------------- /************\ ----------------------------- #
+# ------------------------ [Mapping Utility Functions] ----------------------- #
+# ------------------------------- \************/ ----------------------------- #
+
+# -------------- THE EXAMPLE USED IN THE INCOMING NOTES ABOUT IS ------------- #
+export class CreateCatDto {
+  name: string;
+  age: number;
+  breed: string;
+}
+# ----------------------------------- ***** ---------------------------------- #
+
+# ---------------------- About the PartialType() metyhod --------------------- #
+The  PartialType() method is used to construct a new  class (type) from another BY setting the fields of the last as OPTIONAL in the newly
+constructed one 
+Example: 		export class UpdateUserDto extends PartialType(CreateUserDto){}  
+# ----------------------------------- ***** ---------------------------------- #
+
+# ------------------------ About The PickType() method ----------------------- #
+The PickType() method is used to construct a new class (type) by choosing (picking) a set of properties from the input class (type)
+Example: 		export class UpdateCatAgeDto extends PickType(CreateCatDto, ['age'] as const) {} 
+# ----------------------------------- ***** ---------------------------------- #
+
+# ------------------------ About The OmitType() method ----------------------- #
+The OMitType() method is used to constrcut a new class (type) by pucking all the properties from  the input type class 
+and then removing a set of keys.
+Example:	export class UpdateCatDto extends OmitType(CreateCatDto, ['name'] as const) {}
+	=>> Here we want for the UpdateCatDto to  include the properties from the CreateCatDto except for the name property
+# ----------------------------------- ***** ---------------------------------- #
+
+# -------------------- About the IntersectionType() method ------------------- #
+The IntersectionType() method is used to combine two input class types into one class type.
+Example:
+Supposing we have another class beside the CreateCatDto described as follows:
+
+
+export class AdditionalCatInfo {
+  color: string;
+}
+
+And we want to combine the two classes into one class (UpdateClassDto)
+export class UpdateCatDto extends IntersectionType(
+	CreateCatDto,
+	AdditionnalCatInfo
+)
+# ----------------------------------- ***** ---------------------------------- #
+
+# ------------------------ Composing Mapping Functions ----------------------- #
+We can always compose the previous Mapping Functions to construct a new class.
+For instance, if we want the UpdateCatDto to be composed from the CreateCatDto and The AdditionnalCatInfo 
+but without having the breed property of the CreateCatDto
+Example: 
+	export class UpdateCatDto extends IntersectionType(
+		OmitType(CreateCatDto, ["breed"] as const),
+		AdditionalCatInfo
+	){}
+
+# ----------------------------------- ***** ---------------------------------- #
+
+# ----------------------- Parsing and validating arrays ---------------------- #
+An Array is a generic type (handled the same as Typescript Interfaces ) meaning that the ValidationPipe can't validate it properly,
+To solve the issue, we can use the ParseArray pipe on the incoming property
+>> Example 1: 
+@Get()
+@Post()
+createBulk(
+  @Body(new ParseArrayPipe({ items: CreateUserDto }))
+  createUserDtos: CreateUserDto[],
+) {
+  return 'This action adds new users';
+}
+
+>> Example 2:
+findByIds(
+  @Query('ids', new ParseArrayPipe({ items: Number, separator: ',' }))
+  ids: number[],
+) {
+  return 'This action returns users by ids';
+}
+
+Another way to force the validation of incoming arrays is to wrap them in a property of a dedicated class type.
+>> Example 3:
+// NEED THIS EXAMPLE (Custom example)
+# ----------------------------------- ***** ---------------------------------- #
+
