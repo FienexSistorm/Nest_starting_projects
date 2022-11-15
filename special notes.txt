@@ -122,3 +122,29 @@ Another way to force the validation of incoming arrays is to wrap them in a prop
 // NEED THIS EXAMPLE (Custom example)
 # ----------------------------------- ***** ---------------------------------- #
 
+
+# ------------------------------ /************\ ------------------------------ #
+# ----------------------- [FILE UPLOADING WITH MULTER] ----------------------- #
+# ------------------------------ \************/ ------------------------------ #
+
+# ----------------------------------- Intro ---------------------------------- #
+For File-uploading , nest offer a built-in module based on the 'multer' middleware package for exporess.
+Multer handles data posted  in the multipart/form-data format.
+For typing(auto-complete) , we need to install the mutlter typing pachage  ~  $ npm i -D @types/multer
+// NOTE - This package is not compatible with Fastify
+# ----------------------------------- ***** ---------------------------------- #
+
+
+# -------------------------------- Basic usage ------------------------------- #
+
+
+ @Post('upload')
+    @UseInterceptors(FileInterceptor('file'))
+    uploadFile(@UploadedFile() file: Express.Multer.File) {
+        console.log(file);
+    }
+
+-> FileInterceptor  decorator is exported from the @nestjs/platform-express package, it takes two arguments:
+1- fileName: the name of the field of the posted data
+2- options: optional object of type MulterOptions. 
+// NOTE - The FileInterceptor is not compatible with third party cloud providers (like Firebase)
