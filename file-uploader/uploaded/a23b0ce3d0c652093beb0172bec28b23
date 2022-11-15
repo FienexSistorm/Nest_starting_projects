@@ -156,48 +156,34 @@ That pipe is ParseFilePipe and it is used as the example below:
 
 @Post('file')
 uploadFileAndPassValidation(
-  @UseInterceptors(FileInterceptor('file'))
+  @Body() body: SampleDto,
   @UploadedFile(
     new ParseFilePipe({ 
       validators: [
         // ... Set of file validator instances here
-        new MaxFileSizeValidator({ maxSize: 10000 }),     // 1000 = 1Kb
-        new FileTypeValidator({ fileType: "jpeg" })    // Forcing the file type to be a JPEG
+		FileSizeValidationPipe
       ]
     })
   )
   file: Express.Multer.File,
 ) {
-  return {file};
+  return {
+    body,
+    file: file.buffer.toString(),
+  };
 }
+
 # ----------------------------------- ***** ---------------------------------- #
 
+
+
 # -------------- Uploading An array of files passed in one field ------------- #
-In case we want to upload an array filesidentified by the same field name, we can keep the same skeleton of the previous extraction of one file
-but using the plural version as follows:
-  - FileInterceptor()  ->> FilesInterceptor()
-  - @UploadedFile()  ->> @UploadedFiles()
-  - files: Express.Multer.File  ->> Array<Express.Multer.File>
-# ----------------------------------- ***** ---------------------------------- #
 
 
 # ----------- Uploading multiple files each passed in its own field ---------- #
-To upload multiple files (each with its different name key), we'll be using the FileFieldsInterception() decorator to identify each file from each field.
-This method accepts an array of objects defining {name: string , maxCount: number } as the name of the field and the limit of files to be accepted from that field
-Also we will use the plural version @UploadedFiles()
->> Example:
-
-@Post('upload')
-@UseInterceptors(FileFieldsInterceptor([
-  { name: 'first-file', maxCount: 1 },
-  { name: 'second-file', maxCount: 1 },
-]))
-uploadFile(@UploadedFiles() files: { firstFile?: Express.Multer.File[], secondFile?: Express.Multer.File[] }) {
-  return {files}
-}
-# ----------------------------------- ***** ---------------------------------- #
 
 
+# ----------------------- Uploading any number of files ---------------------- #
 
 
 

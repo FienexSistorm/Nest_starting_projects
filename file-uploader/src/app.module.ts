@@ -15,4 +15,4 @@ import { SampleFileUpdloadController } from './sample-file-updload/sample-file-u
   controllers: [AppController, SampleFileUpdloadController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule { }
