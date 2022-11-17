@@ -249,8 +249,10 @@ To use our intercptor, we call the method @UseInterceptor(MY_INTERCEPTOR_NAME) (
 # ----------------------------------- Intro ---------------------------------- #
 StreamableFile is a class that holds on to the stream to be returned, So to return a file we just need to return an instance of 
 this class and the framework will handlde the piping. It can be imported from  '@nestjs/common'
+# ----------------------------------- ***** ---------------------------------- #
 
->> Example:
+# ------------------------------- Basic Example ------------------------------ #
+>> Example
 @Get()
   getFile(): StreamableFile {
     const file = createReadStream(join(process.cwd(), 'package.json'));
@@ -261,8 +263,9 @@ this class and the framework will handlde the piping. It can be imported from  '
 // NOTE - process.cwd() is used to get the current working directory of the node.js process
 
 => The default content type is application/octet-stream, In case we want to changes it, we'll impliment the user of @Header()
->> Example:
 
+# ----------------- Customize the Content-type using @Header ----------------- #
+>> Example:
 @Get("another_file")
     @Header("content-type", "application.json")
     @Header("Content-Disposition", "attachement;filename='package.json'")
@@ -271,3 +274,19 @@ this class and the framework will handlde the piping. It can be imported from  '
     return new StreamableFile(file);"
   }
 # ----------------------------------- ***** ---------------------------------- #
+
+
+
+
+# ------------------------------ /************\ ------------------------------ #
+# --------------------------------- [Guards] --------------------------------- #
+# ------------------------------ \************/ ------------------------------ #
+
+# ----------------------------------- Intro ---------------------------------- #
+Guards are classes annotated as @Injectable(). 
+They determine whether a given request will be handled by the route handler or not, depending on certain conditions(permissions, ...)
+present at run-time, this is refered to as 'Authorization'.
+In NodeJs, Authorization and authentication were handled by Middleware, but they don't knwo which handler will 
+be executed after calling the next().
+On the other hand, Guards give access to ExecutionContext instance which helps us determine what's going to be executed next.
+// NOTE - Guards are executed after all middleware, but BEFORE any pipe or interceptor.
