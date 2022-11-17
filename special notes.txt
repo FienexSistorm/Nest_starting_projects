@@ -200,5 +200,63 @@ uploadFile(@UploadedFiles() files: { firstFile?: Express.Multer.File[], secondFi
 
 
 
+# ------------------------------ /************\ ------------------------------ #
+# ------------------------------ [Interceptors] ------------------------------ #
+# ------------------------------ \************/ ------------------------------ #
 
+# ------------------------------- Introduction ------------------------------- #
+
+
+# ------------------------------- Basic Example ------------------------------ #
+ Ler's first create our interceptor that will  just log two messages; the first is before the invoque of the handler method, the second will log the date after the invoque of the method
+[...]
+
+Interceptors can be controller-scoped, method-scoped, or global-scoped (liek pipes)
+To use our untercptor, we call the method @UseInterceptor(MY_INTERCEPTOR_NAME) (from @nestjs/common)
+>> Example : 
+      @UseInterceptors(LoggingInterceptor)
+      export class CatsController {}
+
+      => Each route in the CatsController will use the LoggingInterceptor to log the two messages
+
+>> Example: In case we want to attach the interceptor at the global level (the appliaction level), we make call to the useGlobalInterceptors;
+      const app = await NestFactory.create(AppModule);
+      app.useGlobalInterceptors(new LoggingInterceptor());      
+
+      => there is a downside of this configuration, since the attachement is made outside the application context, we cannot inject any dependency.
+      We have another way of configuring our intercepor and from inside the application context to we can be able to inject out dependecies (same as Global //TODO: verify[Pipes])
+
+      @Module({
+        providers: [
+          {
+            provide: APP_INTERCEPTOR,
+            useClass: LoggingInterceptor,
+          },
+        ]
+      })
+
+      export calss AppModule{...}
+      // NOTE - regardless of where this configuration is made, the interceptor is GLOBAL.
+# ----------------------------------- ***** ---------------------------------- #
+
+
+
+# ------------------------------ /************\ ------------------------------ #
+# ----------------------------- [Streaming Files] ---------------------------- #
+# ------------------------------ \************/ ------------------------------ #
+
+# ----------------------------------- Intro ---------------------------------- #
+StreamableFile is a class that holds on to the stream to be returned, So to return a file we just need to return an instance of 
+this class and the framework will handlde the piping. It can be imported from  '@nestjs/common'
+
+>> Example:
+@Get()
+  getFile(): StreamableFile {
+    const file = createReadStream(join(process.cwd(), 'package.json'));
+    return new StreamableFile(file);
+  }
+// NOTE - process.cwd() is used to get the current working directory of the node.js process
+
+=> The default content type is application/octet-stream, In case we want to changes it, we'll impliment the user of @Header()
+>> Example:
 
