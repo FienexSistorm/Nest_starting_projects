@@ -1,3 +1,6 @@
+import { TimeoutInterceptor } from './timeout/timeout.interceptor';
+import { CacheInterceptor } from './cache/cache.interceptor';
+import { ErrorInterceptor } from './error/error.interceptor';
 import { LoggingInterceptor } from './logging/logging.interceptor';
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
@@ -9,9 +12,15 @@ import { APP_INTERCEPTOR } from '@nestjs/core';
   controllers: [AppController],
   providers: [
     AppService,
-    LoggingInterceptor
-    // NOTE - This line will configire the LoggingInterceptor as a global one and conserve the ability of using DI inside the Interceptor class
-    // { provide: APP_INTERCEPTOR, useClass: LoggingInterceptor }  
+    LoggingInterceptor,
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: ErrorInterceptor
+    },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: TimeoutInterceptor
+    }
   ],
 
 })

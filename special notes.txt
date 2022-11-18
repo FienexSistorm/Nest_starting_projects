@@ -240,6 +240,22 @@ To use our intercptor, we call the method @UseInterceptor(MY_INTERCEPTOR_NAME) (
       // NOTE - regardless of where this configuration is made, the interceptor is GLOBAL.
 # ----------------------------------- ***** ---------------------------------- #
 
+# ----------------------------- Exception Mapping ---------------------------- #
+If want for example to override the thrown error, we can use an interceptor that will catch the error emitted by the handler and throw onther one using the 
+RXJS catchError() method. 
+>> Example: Error.Interceptor
+# ----------------------------------- ***** ---------------------------------- #
+
+# ----------------------------- Stream Overriding ---------------------------- #
+We can use interceptors to override the returned data. For instance in case the requested data is cached somewhere, we can send it directly instead of re-fetching it.
+>> Example: Cache.Interceptor
+# ----------------------------------- ***** ---------------------------------- #
+
+# ---------------------------- Timeout Interceptor --------------------------- #
+Let's consider that we want to set a timeout on each request to it will be terminated with an emission of an exception incase the endponint couldn't result the request of the user.
+>> Example: Timeout.Interceptor
+# ----------------------------------- ***** ---------------------------------- #
+
 
 
 # ------------------------------ /************\ ------------------------------ #
