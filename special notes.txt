@@ -253,11 +253,11 @@ this class and the framework will handlde the piping. It can be imported from  '
 
 # ------------------------------- Basic Example ------------------------------ #
 >> Example
-@Get()
-  getFile(): StreamableFile {
-    const file = createReadStream(join(process.cwd(), 'package.json'));
-    return new StreamableFile(file);
-  }
+        @Get()
+        getFile(): StreamableFile {
+          const file = createReadStream(join(process.cwd(), 'package.json'));
+          return new StreamableFile(file);
+        }
 
 
 // NOTE - process.cwd() is used to get the current working directory of the node.js process
@@ -266,13 +266,13 @@ this class and the framework will handlde the piping. It can be imported from  '
 
 # ----------------- Customize the Content-type using @Header ----------------- #
 >> Example:
-@Get("another_file")
-    @Header("content-type", "application.json")
-    @Header("Content-Disposition", "attachement;filename='package.json'")
- getFile(): StreamableFile {
-    const file = createReadStream(join(process.cwd(), 'package.json'));
-    return new StreamableFile(file);"
-  }
+        @Get("another_file")
+            @Header("content-type", "application.json")
+            @Header("Content-Disposition", "attachement;filename='package.json'")
+        getFile(): StreamableFile {
+            const file = createReadStream(join(process.cwd(), 'package.json'));
+            return new StreamableFile(file);"
+          }
 # ----------------------------------- ***** ---------------------------------- #
 
 
@@ -283,10 +283,85 @@ this class and the framework will handlde the piping. It can be imported from  '
 # ------------------------------ \************/ ------------------------------ #
 
 # ----------------------------------- Intro ---------------------------------- #
-Guards are classes annotated as @Injectable(). 
+Guards are classes annotated as @Injectable() and they implement CanActive interface.
 They determine whether a given request will be handled by the route handler or not, depending on certain conditions(permissions, ...)
 present at run-time, this is refered to as 'Authorization'.
 In NodeJs, Authorization and authentication were handled by Middleware, but they don't knwo which handler will 
 be executed after calling the next().
 On the other hand, Guards give access to ExecutionContext instance which helps us determine what's going to be executed next.
 // NOTE - Guards are executed after all middleware, but BEFORE any pipe or interceptor.
+# ----------------------------------- ***** ---------------------------------- #
+
+# ---------------------------- Authorization Guard --------------------------- #
+To generate a guard, use the nest commande: ~  $ nest generate guard [guard_name].
+Every guard should implement a canActive() method that will contain the logic behind allowing or preventing the process of the current request by returning a boolean,
+it can also return a promise or an obsevable of a boolean.
+
+--> ExecutionContext .. We can use the instance of this class to get informations of the called method and also informations of the request itself
+ To bind a guard, use the decorator @UseGuards. 
+ >> Example
+        @UseGuards(AuthGuard)
+        @Get("users")
+        listUsers(){...}
+
+// NOTE - @UseGuards accepts a guard's class type or its instance like @UseGuards(new AuthGuard)  
+// NOTE - Guards can also be method-scoped, controller-scoped, or Global-scoped 
+# ----------------------------------- ***** ---------------------------------- #
+
+# ------------------------------- Global Guards ------------------------------ #
+As we mentionned earliers, guards can be global-scoped, meaning we can set a guard for the entire application instead of each controller or each handler.
+To set up a global Guard, we'll simply use the useGlobalGuards() method of the app instance (main.ts file)
+>> Example: 
+        const app = await NestFactory.create(AppModule);
+        app.useGlobalGuards(new RolesGuard());
+
+This configuration have a side effect when it come to dependency injection, since it is happenning outside the application context, we can't inject any class in our guard's class.
+As in all the Injectable classes, we have another alternative way of configuring a global guard without the lost of the ablitity to use dependecy injection, By setting 
+the global guard from inside any module using the following construction:
+
+>> Example:
+      @Module({
+        providers: [
+          {
+            provide: APP_GUARD,
+            useClass: RolesGuard,
+          },
+        ],
+})
+export class AppModule {}
+// NOTE - This approach will regiter our guard as global regardless of which module was used to provide the guard (in our example it was the AppModule)
+# ----------------------------------- ***** ---------------------------------- #
+
+
+# ------------------------- Setting Roles per Handler ------------------------ #
+We would like to set for each controller handler a list of allowed roles that can access it.
+This is where custom metadata comes into play, Nest provides the ability to attach custom metadata to route handler through out @SetMetadata() decorator (imported from @nestjs/common packageo). 
+We will use the @SetMetadata() decorator to pass in the route informations that the 'smart' guard needs to make its decision about the request.
+
+>> Example:
+@Post()
+        @SetMetadata('roles', ['admin'])
+        async create(@Body() createCatDto: CreateCatDto) {
+          this.catsService.create(createCatDto);
+        }
+--> 'roles' is the key and the ['admin'] is our value
+
+// SECTION -  While using @SetMetadata() is a good way to pass metadata, Creating our custom decorator to define roles for our handlers is considered a better practice.
+  - First, let's create our RoleDecorator , we can generate one using the commande:     ~ $  nest generate decorator role
+          import { SetMetadata } from '@nestjs/common';
+          export const Roles = (...roles: string[]) => SetMetadata('roles', roles);
+  - After that, we only need to use our decorator to specify the roles for our route-handler
+          @Post()
+          @Roles('admin')
+          async create(@Body() createCatDto: CreateCatDto) {
+            this.catsService.create(createCatDto);
+          }
+             *****        *****        *****
+Back to our RolesGuard, we need to compare the roles assigned to the current user to the actual roles required by the current route being processed.
+To access the route's roles (custom metadata), we'll use the helper class Reflector (exposed from the @nestjs/core package) injected in the RolesGuard's constructor
+
+>>Example
+        constructor(private reflector: Reflector){}
+        const roles = this.reflector.get<string[]>('roles', context.getHandler());  
+# ----------------------------------- ***** ---------------------------------- #
+
