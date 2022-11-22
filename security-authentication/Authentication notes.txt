@@ -7,3 +7,48 @@
 >>JWT:
         $ npm install --save @nestjs/jwt passport-jwt
         $ npm install --save-dev @types/passport-jwt
+# ----------------------------------- ***** ---------------------------------- #
+
+# ------------------------ ** About Authentication ** ------------------------ #
+Passport is the most known node library for Authentication and we can easily integrate it with Nest using the @nestjs/passport module. 
+Passport is capable of :
+        - Authenticate user by their credentials.
+        - Manage authenticated state.
+        - Attache user information to the Request object for further use in the route handlers.
+Passport has a large ecosystem of strategies that impliment a various set of authentication mechanisms.
+
+The Authentication process of our application is like this:
+        - The user will authenticate with a username and password.
+        - The server will issue a JWT token that can be sent as a bearer token in an authorization header on subsequent requests to prove authentication.
+        - We will set some protected routes that won't be accessible unless the request made contains a valid JWT token.
+
+To implement the user/password authentication, we need to install passport strategy passport-local
+# ----------------------------------- ***** ---------------------------------- #
+
+# ------------------ ** Implementing passwport strategies ** ----------------- #
+The elegance of the Passport framework is that it abstracts the authentication process into a few basic steps that you customize based on the strategy you're implementing.
+It's like a framework because you configure it by supplying customization parameters (as plain JSON objects) and custom code in the form of callback functions, which
+Passport calls at the appropriate time.
+
+With @nestjs/passport, you configure a Passport strategy by extending the PassportStrategy class. You pass the strategy options by calling the super() method in your
+subclass, optionally passing in an options object. You provide the verify callback by implementing a validate() method in your subclass.
+
+>> Example: Auth (Module+Service) && Users (Module+Service)
+# ----------------------------------- ***** ---------------------------------- #
+
+# --------------------- ** Implementing Passport Local ** -------------------- #
+To implement the Passport-local strategy, we'll create a strategy class that will extend PassportStrategy class:
+The class will implement the validate() which represents the verification method for the Passport-local strategy.
+After creating our local.strategy file, we need to configure the auth module to use it.
+To do so is very easy, we simply add the [PassportModule] to the imports list of the module and the [LocalStrategy] to list of the providers.
+>> Example: local.strategy.ts && auth.module.ts
+# ----------------------------------- ***** ---------------------------------- #
+
+# ---------------------- ** Built-in Passport Guards ** ---------------------- #
+In case the user/client is not logged in (not-authenticated), we need to 
+        - deny the user from accessing restricted routes (The use of Guards).
+        - initiate an authentication step when an unauthenticated user attempts to login => set up a POST:auth/login route to handle the login of a user.
+So we need a way to invoke the passport-local strategy in the login route handler to check if the user/client is a valid one
+
+>> SOLUTION: @nestjs/passport provides us with a special built-in guard. It will invoke the Passport strategy (verify the credentials, creating the user property ...).
+and we will use the return of the guard to prevent access to restricted routes which is the basic usage of any normal guard
