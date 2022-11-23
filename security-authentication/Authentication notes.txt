@@ -132,3 +132,50 @@ We'll create a route 'profile' that will return the user object set in the reque
                 getProfile(@Request() req) {
                         return req.user;
                 }
+# ----------------------------------- ***** ---------------------------------- #
+
+# -------------------------- ** Extending Guards ** -------------------------- #
+Sometimes, we might need to extend the provided AuthGuard to impliment somec custom logic for errorHandling or event the authentication logic.
+We can wan always override methods (canActivate | handleRequest) withing the sub-class:
+>> Example : jwt-auth.guard.ts
+# ----------------------------------- ***** ---------------------------------- #
+
+# ------------------- ** Enable Authentication Globally ** ------------------- #
+Incase the majority of our routes should be protected, it would be more convinient to protect al the routes by setting the security globally on our application 
+and than we simply flag the routes that should be public.
+1- We will regiter the JwtGuard to be global - in the AuthModule -
+        providers: [
+                ...
+            {
+                provide: APP_GUARD,
+                useClass: JwtAuthGuard,
+            }
+        ..],
+ ==> this is sufficiant for Nest to bind the JwtAuthGuard to every endpoint.
+
+ 2- Now, we must provide a mechanism for declaring routes as public => We'll create a custom decorator using the SetMetadata decorator factory function.
+>> Example : Public.decorator.ts
+                import { SetMetadata } from '@nestjs/common';
+
+                export const IS_PUBLIC_KEY = 'isPublic';
+                export const Public = () => SetMetadata(IS_PUBLIC_KEY, true);
+// NOTE - It can also be named SkipAuth
+
+3- Now that we have a custom @Public() decorator, we can use it to decorate any method, as follows
+                @Public()
+                @Get()
+                findAll() {
+                return [];
+                }
+4- Lastly, we need the JwtAuthGuard to return true when the "isPublic" metadata is found. 
+ => For this, we'll use the Reflector class to override the canActivate() method of the JwtAuthGuard class
+                canActivate(context: ExecutionContext) {
+                        const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
+                        context.getHandler(),
+                        context.getClass(),
+                     ]);
+                     if (isPublic) {
+                        return true;
+                     }
+                     return super.canActivate(context);
+                }

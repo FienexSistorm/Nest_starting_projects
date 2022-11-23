@@ -1,19 +1,25 @@
-import { JwtAuthGuard } from './auth/jwt-auth.guard';
-import { LocalAuthGuard } from './auth/local-auth.guard';
+import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
+import { LocalAuthGuard } from './auth/guards/local-auth.guard';
 import { Controller, Get } from '@nestjs/common';
 import { Post, Req, UseGuards } from '@nestjs/common';
 import { AppService } from './app.service';
 import { AuthService } from './auth/auth.service';
+import { Public } from './auth/decorators/public.decorator';
 
 @Controller()
 export class AppController {
   constructor(private readonly appService: AppService, private authServ: AuthService) { }
 
+
+  @Public() // Using our custom-decorator to set the route as public so the auth verification process will be skipped
   @Get()
   getHello(): string {
     return this.appService.getHello();
   }
 
+
+  @Public()
+  
   // @UseGuards(AuthGuard('local'))  // Normal usage of the AuthGuard Class 
   @UseGuards(LocalAuthGuard)    // Using our localGuard that extends from the AuthGuard Class
   @Post("auth/login")

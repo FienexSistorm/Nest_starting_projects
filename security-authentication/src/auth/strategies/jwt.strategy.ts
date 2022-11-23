@@ -1,4 +1,4 @@
-import { jwtContants } from './contants';
+import { jwtContants } from '../contants';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 
