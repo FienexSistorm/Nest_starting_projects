@@ -75,3 +75,39 @@ And we can use it as follows:
                 async login(@Request() req) {
                         return req.user;
                 }
+# ----------------------------------- ***** ---------------------------------- #
+
+
+# -------------------------- ** JWT Functionality ** ------------------------- #
+The @nestjs/jwt package is a utility package that helps with JWT manipulation. 
+The passport-jwt package is the Passport package that implements the JWT strategy
+@types/passport-jwt provides the TypeScript type definitions.
+We will generate a JWT token and pass it to the route. We'll do this in our auth.service.
+
+- Let's start by importing and injecting a Service JwtService from '@nestjs/jwt'.
+- we'll continue by creating a metho login() that will recieve the user's informations and generates the JWT-token:
+
+>> Example:     
+                async login(user: any) {
+                        const payload = { usernmae: user.username, sub: user.userId };
+                        return {
+                                access_token: this.jwtServ.sign(payload)
+                        }
+                }
+=>  sign() metho genrates a jwt-token from to supplied payload object. we choose the userId to be a subset from that payload
+// NOTE - We need to register the JwtModule and configure it in order of the jwtService to work. we'll do that in the AuthModule
+        imports: [ ...
+                JwtModule.register({
+                         secret: jwtConstants.secret,           // setting a secret to be used in the process of generating the jwt-token and 'decoding it'
+                         signOptions: { expiresIn: '60s' },
+                }),
+                ...]
+
+# ----------------------------------- ***** ---------------------------------- #
+
+
+# ---------------------- ** Implimenting Passport JWT ** --------------------- #
+Now we need to protect our routes by requiring a valid jwt_token to access them.
+Passport can help us here too. It provides the passport-jwt strategy for securing RESTful endpoints with JSON Web Tokens.
+- Let's start by creating a file called jwt.strategy.ts in the auth folder.
+>> Example:: jwt.strategy.ts
