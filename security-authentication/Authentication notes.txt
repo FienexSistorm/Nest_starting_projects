@@ -111,3 +111,24 @@ Now we need to protect our routes by requiring a valid jwt_token to access them.
 Passport can help us here too. It provides the passport-jwt strategy for securing RESTful endpoints with JSON Web Tokens.
 - Let's start by creating a file called jwt.strategy.ts in the auth folder.
 >> Example:: jwt.strategy.ts
+
+// NOTE -
+  -> jwtFromRequest :supplies the method by which the JWT will be extracted from the Request
+  -> fromAuthHeaderAsBearerToken: use the standard approach of supplying a bearer token in the Authorization header of our API requests.
+  -> igonreExpiration: false => Indicate that the token's expiration should be verified.
+  -> secretOrKey: used to pass in the secret used in the process of generating the token.
+
+- After that, we simply need to add our JwtStrategy in the providers list of the AuthModule to be registered.           
+- Finally, we need to create our JwtAuthGuard as we did for the LocalAuthGuard by specifying the jwt as strategy of th AuthGuard
+                export class JwtAuthGuard extends AuthGuard('jwt') {}
+
+
+# ----------------------------------- ***** ---------------------------------- #
+
+# --------- ** Implimening protexted route and Jwt Strategy Guards ** -------- #
+We'll create a route 'profile' that will return the user object set in the request and we also need to protect the route using our JwtStrategyGuard we created earlier:
+                @UseGuards(JwtAuthGuard)
+                @Get('profile')
+                getProfile(@Request() req) {
+                        return req.user;
+                }

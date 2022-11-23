@@ -1,3 +1,4 @@
+import { JwtAuthGuard } from './auth/jwt-auth.guard';
 import { LocalAuthGuard } from './auth/local-auth.guard';
 import { Controller, Get } from '@nestjs/common';
 import { Post, Req, UseGuards } from '@nestjs/common';
@@ -19,8 +20,17 @@ export class AppController {
   async login(@Req() request) {
     console.log(request.user)
     // calling the login method to generate the jwt-token for our newly logged it user after that the guard checked his credintials validity
-    return  {token: (await this.authServ.login(request.user)).access_token, user:request.user} ;
+    return { token: (await this.authServ.login(request.user)).access_token, user: request.user };
 
+  }
+
+
+
+  // A Protected route using the JwtAuthGuard to insure that the request contains a s valid unexpired token
+  @UseGuards(JwtAuthGuard)
+  @Get('profile')
+  getProfile(@Req() req) {
+    return req.user;
   }
 
 }

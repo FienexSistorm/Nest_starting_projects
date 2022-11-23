@@ -1,3 +1,4 @@
+import { JwtStrategy } from './jwt.strategy';
 import { jwtContants } from './contants';
 import { LocalStrategy } from './local.strategy';
 import { Module } from '@nestjs/common';
@@ -9,7 +10,8 @@ import { JwtModule } from '@nestjs/jwt/dist';
 @Module({
   providers: [
     AuthService,
-    LocalStrategy
+    LocalStrategy,
+    JwtStrategy
   ],
   imports: [
     UsersModule,
