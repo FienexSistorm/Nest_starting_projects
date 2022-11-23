@@ -61,5 +61,17 @@ and we will use the return of the guard to prevent access to restricted routes w
                 async login(@Request() req) {
                         return req.user;
                 }
-=> like the example shows, we used the @UseGuards() decorator to use our 'AuthGuard' Guard provided by the @nestjs/passport module, offering it the 'local' value
-to set the type of strategy we're using.
+=> like the example shows, we used the @UseGuards() decorator to use our 'AuthGuard' Guard supplied by the @nestjs/passport module, offering it the 'local' value
+which is the 
+
+// NOTE - it is considered to be a better practice if we set a class that will extend the AuthGard("local") and pass it through our UseGuards() decorator:
+                @Injectable()
+                export class LocalGuard extends AuthGuard("local"){
+
+                }
+And we can use it as follows:
+                @UseGuards(LocalGuard)
+                @Post('auth/login')
+                async login(@Request() req) {
+                        return req.user;
+                }
