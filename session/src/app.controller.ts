@@ -4,6 +4,14 @@ import { AppService } from './app.service';
 
 @Controller()
 export class AppController {
+  
+  /**
+   * 
+   * @param session.visits will be increased by any request made to these two routes.
+   * The idea is demonstrate the access of the session object and manipulate our informations and rextract them
+   * The value will be overriden each time a request was made thanks to session configuration's resave option set to false
+   */
+
   constructor(private readonly appService: AppService) { }
 
   @Get()
