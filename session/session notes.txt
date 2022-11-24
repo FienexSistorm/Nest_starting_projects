@@ -1,0 +1,35 @@
+# --------------------------- ** About Sessions ** --------------------------- #
+We can use Http Sessions to store informatilns about the user across multiple requests.
+
+# ----------------------- ** Installation  && Setup ** ----------------------- #
+We can install sessions in our nest project & setting the types for auto-complete using these two commands:
+        ~ $ npm i express-session
+        ~ $ npm i -D @types/express-session
+
+After the installation is complete, we need to set configure the application to use the session, so in our main.ts file :
+        import * as session from 'express-session'
+
+        ...
+        app.use(
+            session({
+                secret: 'my-secret',
+                resave: false,
+                saveUninitializes: false
+            })
+        )
+
+// NOTE - Enabling the resave option forces the session to be saved back to the session store, even if the session was never modified during the request. (we set it to false)
+// NOTE - Enabling the saveUninitialized option Forces a session that is "uninitialized" to be saved to the store. A session is uninitialized when it is new but not modified.
+
+# -------------------------- ** Example of usage ** -------------------------- #
+With this in place, you can now set and read session values from within the route handlers, as follows:
+        @Get()
+        findAll(@Req() request: Request) {
+            request.session.visits = request.session.visits ? request.session.visits + 1 : 1;
+        }
+// NOTE - @Req() is imported from @nestjs/common && Request is imported from express package
+Another way is to use the @Session decorator (imported from @nestjs/common) to extract the session object from the request
+@Get()
+findAll(@Session() session: Record<string, any>) {
+  session.visits = session.visits ? session.visits + 1 : 1;
+}
