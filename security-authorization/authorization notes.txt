@@ -1,0 +1,46 @@
+# ------------------------- ** About Authorization ** ------------------------ #
+Authorization is the process that determines whether a user is able to do, either he'll be able to do some actions within the application or not, 
+event if he has authenticated successfully.
+This helps manage application-registered-users actions and capabilites within the application.
+
+>> In the application, we'll use two approaches; RBAC (Role based Access Control) and Claims based Authorization.
+// NOTE - We can also use CASL package to manage users autorizations
+# ----------------------------------- ***** ---------------------------------- #
+
+# -------------------------------- ** RBAC ** -------------------------------- #
+Role Based Access Controll is an access-control mechanism defined around roles and privilages.
+
+* 1- create a Role enum that will represent the roles needed by the application:
+    export enum Role {
+        User = 'user',
+        Admin = 'admin',
+    }
+    // NOTE - It would be better to store roles in the database or we can use a  roles provider
+
+* 2- Create a @Roles() decorator so we can specify the premitted roles for a certain route handler:
+    export const ROLES_KEY = 'roles';
+    export const Roles = (...roles: Role[]) => SetMetadata(ROLES_KEY, roles);
+
+* 3- Decorate the route handler with previously created decorator to indicate the permitted roles:
+    @Post()
+    @Roles(Role.Admin)
+    create(@Body() createCatDto: CreateCatDto) {
+        this.catsService.create(createCatDto);
+    }
+
+* 4- Finally, we need to create a RolesGuard class which will compare the roles assigned to the current user to the actual roles required by the current 
+route being processed. 
+In order to access the route's role(s) (custom metadata), we'll use the Reflector helper class, which is provided out of the box by the framework 
+and exposed from the @nestjs/core package.
+
+canActivate(context: ExecutionContext): boolean {
+    const requiredRoles = this.reflector.getAllAndOverride<Role[]>(ROLES_KEY, [
+      context.getHandler(),
+      context.getClass(),
+    ]);
+    if (!requiredRoles) {
+      return true;
+    }
+    const { user } = context.switchToHttp().getRequest();
+    return requiredRoles.some((role) => user.roles?.includes(role));
+  }
