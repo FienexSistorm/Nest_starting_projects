@@ -15,7 +15,7 @@ Role Based Access Controll is an access-control mechanism defined around roles a
         User = 'user',
         Admin = 'admin',
     }
-    // NOTE - It would be better to store roles in the database or we can use a  roles provider
+    // NOTE - It would be better to store roles in the database or we can use a roles provider
 
 * 2- Create a @Roles() decorator so we can specify the premitted roles for a certain route handler:
     export const ROLES_KEY = 'roles';
@@ -44,3 +44,4 @@ canActivate(context: ExecutionContext): boolean {
     const { user } = context.switchToHttp().getRequest();
     return requiredRoles.some((role) => user.roles?.includes(role));
   }
+=> // NOTE - Don't forget to set the RoleGuard as global in your application 
